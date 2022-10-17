@@ -2,6 +2,8 @@ import express from "express"
 import bodyParser from "body-parser"
 import mongoose from "mongoose"
 import userRouter from "./user/user.router.js"
+import * as dotenv from 'dotenv' 
+dotenv.config()
 
 const app=express()
 const port =process.env.PORT || 5000
