@@ -19,5 +19,5 @@ app.get('/',(req,res)=>{
 
 app.listen(port,async ()=>{
     await mongoose.connect('mongodb+srv://faizanghani2222:27102001@cluster0.ett7idf.mongodb.net/blog')
-    console.log("started server")
+    console.log(`started server at port ${port}`)
 })
