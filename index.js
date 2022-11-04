@@ -1,23 +1,41 @@
-import express from "express"
-import bodyParser from "body-parser"
-import mongoose from "mongoose"
-import userRouter from "./user/user.router.js"
-import * as dotenv from 'dotenv' 
-dotenv.config()
+const express = require("express");
+const http = require("http");
+const cors = require("cors");
+const connection = require("./db");
+const {user,upload,comment}=require("./Routes/index");
+require("dotenv").config();
 
-const app=express()
-const port =process.env.PORT || 5000
 
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json())
+const PORT = process.env.PORT || 8080;
 
-app.use("/user",userRouter)
+const app = express();
+const server = http.createServer(app);
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use("/", user);
+app.use("/blog", blog);
+connection();
+app.use("/file", upload);
+app.use("/comment", comment);
+const { Server } = require("socket.io");
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    method: ["GET", "POST"],
+  },
+});
+io.on("connection", (socket) => {
+  console.log("new user connected" + socket.id);
+  socket.on("sent_by_client", (data) => {
+    io.emit("sent_by_server", data);
+  });
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
 
-app.get('/',(req,res)=>{
-    res.send("Hello server 1")
-})
 
-app.listen(port,async ()=>{
-    await mongoose.connect('mongodb+srv://faizanghani2222:27102001@cluster0.ett7idf.mongodb.net/blog')
-    console.log("started server")
-})
+server.listen(PORT, () => {
+  console.log(`server started on http://localhost:8080`);
+});
